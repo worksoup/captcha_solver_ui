@@ -1,0 +1,29 @@
+export component Eillpse inherits Path {
+    property <float> a: self.width / 2px;
+    property <float> b: self.height / 2px;
+    property <float> a2: a * a;
+    property <float> b2: b * b;
+    property <float> e2: 1.0 - self.b2 / self.a2;
+    property <string> cmd1: self.command(180deg);
+    property <string> cmd2: self.command(360deg);
+    out property <string> cmd: "M \{self.eillpse-x(0)} \{self.eillpse-y(0)} \{self.cmd1} \{self.cmd2}";
+    function sin2(theta: angle) -> float {
+        sin(theta) * sin(theta)
+    }
+    function cos2(theta: angle) -> float {
+        cos(theta) * cos(theta)
+    }
+    function r(theta: angle) -> float {
+        self.b / sqrt(1.0 - self.e2 * cos2(theta))
+    }
+    function eillpse-x(theta: angle) -> float {
+        self.a + r(theta) * cos(theta)
+    }
+    function eillpse-y(theta: angle) -> float {
+        self.b - r(theta) * sin(theta)
+    }
+    function command(end: angle) -> string {
+        "A \{self.a} \{self.b} 0 0 0 \{self.eillpse-x(end)} \{self.eillpse-y(end)}"
+    }
+    commands: self.cmd;
+}

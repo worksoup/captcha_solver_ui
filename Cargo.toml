@@ -1,0 +1,19 @@
+[package]
+name = "captcha_dataset_marker"
+version = "0.0.1"
+edition = "2021"
+
+[features]
+cxlib_integrated = ["cxlib_error", "cxlib_imageproc"]
+
+[dependencies]
+atomic_float = "1.0"
+imageproc = "0.25"
+cxlib_error = { git = "https://github.com/worksoup/cxlib.git", optional = true }
+cxlib_imageproc = { git = "https://github.com/worksoup/cxlib.git", optional = true }
+image = "0.25"
+slint = "1.8"
+thiserror = "2.0"
+
+[build-dependencies]
+slint-build = "1.8.0"

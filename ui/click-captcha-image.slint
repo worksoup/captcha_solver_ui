@@ -1,0 +1,47 @@
+import { SlintPoint } from "types.slint";
+import { Eillpse } from "eillpse.slint";
+export component ClickCaptchaImage {
+    in property <image> image;
+    callback push-point(int, int);
+    in-out property <[SlintPoint]> points;
+    width: 320px;
+    height: 160px;
+    Rectangle {
+        width: root.width;
+        height: root.height;
+    }
+
+    Image {
+        source: image;
+    }
+
+    for point in points: Eillpse {
+        width: 16px;
+        height: 16px;
+        x: point.x * 1px - self.width / 2;
+        y: point.y * 1px - self.height / 2;
+        stroke: red;
+        stroke-width: 3px;
+    }
+    out property <Point> current-point;
+    Eillpse {
+        width: 20px;
+        height: 20px;
+        x: touch.mouse-x - self.width / 2;
+        y: touch.mouse-y - self.height / 2;
+        stroke: green;
+        stroke-width: 4px;
+    }
+
+    touch := TouchArea {
+        pointer-event(event) => {
+            if (event.button == PointerEventButton.left && event.kind == PointerEventKind.down) {
+                current-point.x = touch.mouse-x;
+                current-point.y = touch.mouse-y;
+            }
+        }
+        clicked => {
+            push-point(root.current-point.x / 1px, root.current-point.y / 1px);
+        }
+    }
+}

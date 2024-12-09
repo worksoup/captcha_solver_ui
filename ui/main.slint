@@ -1,0 +1,88 @@
+import { StandardButton, Slider } from "std-widgets.slint";
+export { ClickCaptchaSolverUi ,SlideOrRotateSolverUi}
+import { SlintPoint, ClickCaptchaType, SlideOrRotateCaptchaType } from "types.slint";
+import { ClickCaptchaWidget } from "click-captcha.slint";
+import { SlideOrRotateWidget } from "slide-or-rotate.slint";
+
+component ClickCaptchaSolverUi inherits Window {
+    in property <ClickCaptchaType> captcha-type;
+    in property <image> image;
+    in property <string> hanzi;
+    in property <image> click-icon;
+    in-out property <[SlintPoint]> points;
+    property <int> max-points-count: (captcha-type == ClickCaptchaType.IconClick || captcha-type == ClickCaptchaType.TextClick) ? 3 : 1;
+    callback verify-button-clicked <=> widget.verify-button-clicked;
+    callback push-point <=> widget.push-point;
+    callback pop-point <=> widget.pop-point;
+    callback cancel <=> widget.cancel;
+    min-width: 330px;
+    max-width: 330px;
+    min-height: 240px;
+    max-height: 240px;
+    init => {
+        focus.focus();
+    }
+    focus := FocusScope {
+        widget := ClickCaptchaWidget {
+            max-points-count: root.max-points-count;
+            points: root.points;
+            image: root.image;
+            property <string> content:(captcha-type == ClickCaptchaType.IconClick || captcha-type == ClickCaptchaType.Obstacle) ? "图标：" : "汉字：\{root.hanzi}";
+            Text {
+                text: "请依次点击\{parent.content}";
+            }
+
+            if (captcha-type == ClickCaptchaType.IconClick || captcha-type == ClickCaptchaType.Obstacle): Image {
+                source: click-icon;
+            }
+        }
+
+        key-pressed(event) => {
+            debug(self.height);
+            // debug(event.text);
+            if (event.text == "z" && event.modifiers.control && !event.modifiers.alt && !event.modifiers.meta && !event.modifiers.shift) {
+                pop-point();
+            }
+            if (event.text == "q" && event.modifiers.control && !event.modifiers.alt && !event.modifiers.meta && !event.modifiers.shift) {
+                cancel();
+            }
+            if (points.length >= max-points-count && (event.text == Key.Return || event.text == Key.Space) && !event.modifiers.shift && !event.modifiers.control && !event.modifiers.alt && !event.modifiers.meta) {
+                verify-button-clicked();
+            }
+            EventResult.reject
+        }
+    }
+}
+
+component SlideOrRotateSolverUi inherits Window {
+    in property <image> outer-image;
+    in property <image> inner-image;
+    in property <SlideOrRotateCaptchaType> captcha-type;
+    callback verify <=> widget.verify;
+    callback cancel <=> widget.cancel;
+    min-width: 330px;
+    max-width: 330px;
+    min-height: 254px;
+    max-height: 254px;
+    init => {
+        focus.focus();
+    }
+    focus := FocusScope {
+        widget := SlideOrRotateWidget {
+            captcha-type: root.captcha-type;
+            outer-image: root.outer-image;
+            inner-image: root.inner-image;
+        }
+
+        key-pressed(event) => {
+            // debug(event.text);
+            if (event.text == "q" && event.modifiers.control && !event.modifiers.alt && !event.modifiers.meta && !event.modifiers.shift) {
+                cancel();
+            }
+            if ((event.text == Key.Return || event.text == Key.Space) && !event.modifiers.shift && !event.modifiers.control && !event.modifiers.alt && !event.modifiers.meta) {
+                widget.call-verify();
+            }
+            EventResult.reject
+        }
+    }
+}

@@ -1,0 +1,53 @@
+import { Button, StandardButton, VerticalBox } from "std-widgets.slint";
+import { Eillpse } from "eillpse.slint";
+import { SlintPoint } from "types.slint";
+import { ClickCaptchaImage } from "click-captcha-image.slint";
+export { ClickCaptchaWidget }
+
+
+component ClickCaptchaWidget {
+    in property <image> image;
+    in property <int> max-points-count;
+    in-out property <[SlintPoint]> points;
+    callback verify-button-clicked <=> verify-button.clicked;
+    callback push-point <=> show.push-point;
+    callback pop-point <=> undo-button.clicked;
+    callback cancel <=> cancel-button.clicked;
+
+    VerticalBox {
+        alignment: center;
+        HorizontalLayout {
+            alignment: center;
+            show := ClickCaptchaImage {
+                points: root.points;
+                image: root.image;
+            }
+        }
+
+        // Text {
+        //     text: "\{show.current-point.x / 1px},\{show.current-point.y / 1px}";
+        // }
+
+        HorizontalLayout {
+            alignment: center;
+            @children
+        }
+
+        HorizontalLayout {
+            alignment: end;
+            spacing: 20px;
+            verify-button := StandardButton {
+                kind: StandardButtonKind.ok;
+                enabled: points.length >= root.max-points-count;
+            }
+
+            undo-button := Button {
+                text: @tr("撤销");
+            }
+
+            cancel-button := StandardButton {
+                kind: StandardButtonKind.cancel;
+            }
+        }
+    }
+}

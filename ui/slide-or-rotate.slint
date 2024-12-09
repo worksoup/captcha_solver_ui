@@ -1,0 +1,112 @@
+import { StandardButton, Slider, VerticalBox } from "std-widgets.slint";
+import { SlideOrRotateCaptchaType} from "types.slint";
+export { SlideOrRotateWidget }
+
+component RotateImage {
+    width: 160px;
+    height: 160px;
+    in property <image> fixed-image;
+    in property <image> rotatable-image;
+    in-out property <angle> rotation;
+    Image {
+        width: parent.width;
+        height: parent.height;
+        source: fixed-image;
+        x: 0;
+        y: 0;
+    }
+
+    rotatable := Image {
+        width: parent.width;
+        height: parent.height;
+        source: rotatable-image;
+        rotation-angle: parent.rotation;
+        x: 0;
+        y: 0;
+    }
+}
+
+component SlideImage {
+    width: 320px;
+    height: 160px;
+    in property <image> big-image;
+    in property <image> small-image;
+    in-out property <length> movtion;
+    Image {
+        width: parent.width;
+        height: parent.height;
+        source: big-image;
+        x: 0;
+        y: 0;
+    }
+
+    rotatable := Image {
+        height: parent.height;
+        source: small-image;
+        x: movtion;
+        y: 0;
+    }
+}
+
+component SlideOrRotateWidget {
+    in property <image> outer-image;
+    in property <image> inner-image;
+    in property <SlideOrRotateCaptchaType> captcha-type;
+    callback verify(float);
+    callback cancel <=> cancel-button.clicked;
+    public function call-verify() {
+        verify(captcha-type == SlideOrRotateCaptchaType.Slide ? slider.value : slider.value / 4);
+    }
+    VerticalBox {
+        alignment: center;
+        HorizontalLayout {
+            alignment: center;
+            if captcha-type == SlideOrRotateCaptchaType.Slide: SlideImage {
+                big-image: root.outer-image;
+                small-image: root.inner-image;
+                movtion: slider.value * 1px;
+            }
+            if captcha-type == SlideOrRotateCaptchaType.Rotate: RotateImage {
+                fixed-image: root.outer-image;
+                rotatable-image: root.inner-image;
+                rotation: slider.value * 0.25deg;
+            }
+        }
+
+        HorizontalLayout {
+            alignment: center;
+            VerticalLayout {
+                alignment: center;
+                HorizontalLayout {
+                    alignment: center;
+                    slider := Slider {
+                        width: 280px;
+                        maximum: captcha-type == SlideOrRotateCaptchaType.Slide ? 264 : 2016;
+                    }
+                }
+
+                HorizontalLayout {
+                    alignment: center;
+                    Text {
+                        text: captcha-type == SlideOrRotateCaptchaType.Slide ? "请将图片滑动至合适位置。" : "请将图片旋转至合适角度。";
+                    }
+                }
+            }
+        }
+
+        HorizontalLayout {
+            alignment: end;
+            spacing: 20px;
+            verify-button := StandardButton {
+                kind: StandardButtonKind.ok;
+                clicked => {
+                    call-verify();
+                }
+            }
+
+            cancel-button := StandardButton {
+                kind: StandardButtonKind.cancel;
+            }
+        }
+    }
+}
