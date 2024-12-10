@@ -1,5 +1,5 @@
-use crate::{cut_picture, Point};
 use crate::{
+    cut_picture,
     slint_ui::{ClickCaptchaSolverUi, ClickCaptchaType, SlideOrRotateCaptchaType, SlintPoint},
     utils::rgba_image_to_slint_image,
     CaptchaError,
@@ -7,6 +7,7 @@ use crate::{
 use image::DynamicImage;
 use slint::{ComponentHandle, Model, ModelRc};
 use std::sync::{atomic::AtomicBool, Arc};
+use yapt::Point;
 
 type TriplePoint<T> = (Point<T>, Point<T>, Point<T>);
 pub mod click_captcha;
@@ -130,13 +131,13 @@ pub struct MSlide;
 impl Marker for MSlide {
     type Input = (DynamicImage, DynamicImage);
 
-    type Output = f32;
+    type Output = u32;
 }
 pub struct MRotate;
 impl Marker for MRotate {
     type Input = (DynamicImage, DynamicImage);
 
-    type Output = f32;
+    type Output = u32;
 }
 pub struct MIconClick;
 impl Marker for MIconClick {

@@ -1,4 +1,4 @@
-use crate::Point;
+use yapt::Point;
 
 slint::include_modules!();
 

@@ -1,14 +1,16 @@
+use super::{SlideOrRotateVerificationInfoTrait, SolverUiTrait};
 use crate::{slint_ui::SlideOrRotateSolverUi, utils::rgba_image_to_slint_image, CaptchaError};
-use atomic_float::AtomicF32;
 use image::DynamicImage;
 use slint::ComponentHandle;
-use std::sync::{atomic::AtomicBool, Arc};
-use super::{SlideOrRotateVerificationInfoTrait, SolverUiTrait};
+use std::sync::{
+    atomic::{AtomicBool, AtomicU32},
+    Arc,
+};
 
-impl<T: SlideOrRotateVerificationInfoTrait<Input = (DynamicImage, DynamicImage), Output = f32>>
+impl<T: SlideOrRotateVerificationInfoTrait<Input = (DynamicImage, DynamicImage), Output = u32>>
     SolverUiTrait<T> for SlideOrRotateSolverUi
 {
-    type DataContainer = Arc<AtomicF32>;
+    type DataContainer = Arc<AtomicU32>;
 
     fn new() -> Self {
         SlideOrRotateSolverUi::new().unwrap()
@@ -19,7 +21,7 @@ impl<T: SlideOrRotateVerificationInfoTrait<Input = (DynamicImage, DynamicImage),
     }
 
     fn create_data_container() -> Self::DataContainer {
-        Arc::new(AtomicF32::new(0.0))
+        Arc::new(AtomicU32::new(0))
     }
 
     fn prepare(
@@ -34,7 +36,10 @@ impl<T: SlideOrRotateVerificationInfoTrait<Input = (DynamicImage, DynamicImage),
         self.set_inner_image(inner_image);
         let self_weak = self.as_weak();
         self.on_verify(move |result| {
-            data_container.store(result, std::sync::atomic::Ordering::Relaxed);
+            data_container.store(
+                (result / 504.0 * 280.0).round() as u32,
+                std::sync::atomic::Ordering::Relaxed,
+            );
             if let Some(self_weak) = self_weak.upgrade() {
                 self_weak.hide().unwrap();
             }
@@ -53,7 +58,7 @@ impl<T: SlideOrRotateVerificationInfoTrait<Input = (DynamicImage, DynamicImage),
         });
     }
 
-    fn get_data(data: Self::DataContainer) -> Result<f32, CaptchaError> {
+    fn get_data(data: Self::DataContainer) -> Result<u32, CaptchaError> {
         Ok(data.load(std::sync::atomic::Ordering::Relaxed))
     }
 }
