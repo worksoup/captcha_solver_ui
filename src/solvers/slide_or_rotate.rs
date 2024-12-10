@@ -36,10 +36,7 @@ impl<T: SlideOrRotateVerificationInfoTrait<Input = (DynamicImage, DynamicImage),
         self.set_inner_image(inner_image);
         let self_weak = self.as_weak();
         self.on_verify(move |result| {
-            data_container.store(
-                (result / 504.0 * 280.0).round() as u32,
-                std::sync::atomic::Ordering::Relaxed,
-            );
+            data_container.store(result.round() as u32, std::sync::atomic::Ordering::Relaxed);
             if let Some(self_weak) = self_weak.upgrade() {
                 self_weak.hide().unwrap();
             }

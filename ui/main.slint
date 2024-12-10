@@ -38,7 +38,7 @@ component ClickCaptchaSolverUi inherits Window {
         }
 
         key-pressed(event) => {
-            debug(self.height);
+            // debug(self.height);
             // debug(event.text);
             if (event.text == "z" && event.modifiers.control && !event.modifiers.alt && !event.modifiers.meta && !event.modifiers.shift) {
                 pop-point();

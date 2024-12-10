@@ -55,7 +55,7 @@ component SlideOrRotateWidget {
     callback verify(float);
     callback cancel <=> cancel-button.clicked;
     public function call-verify() {
-        verify(captcha-type == SlideOrRotateCaptchaType.Slide ? slider.value : slider.value / 4);
+        verify(captcha-type == SlideOrRotateCaptchaType.Slide ? slider.value : slider.value / 7.2);
     }
     VerticalBox {
         alignment: center;
