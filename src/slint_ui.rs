@@ -1,4 +1,4 @@
-use yapt::Point;
+use yapt::point_2d::Point;
 
 slint::include_modules!();
 

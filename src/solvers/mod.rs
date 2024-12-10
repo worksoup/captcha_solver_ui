@@ -7,7 +7,7 @@ use crate::{
 use image::DynamicImage;
 use slint::{ComponentHandle, Model, ModelRc};
 use std::sync::{atomic::AtomicBool, Arc};
-use yapt::Point;
+use yapt::point_2d::Point;
 
 type TriplePoint<T> = (Point<T>, Point<T>, Point<T>);
 pub mod click_captcha;

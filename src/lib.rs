@@ -20,8 +20,8 @@ impl std::fmt::Display for CaptchaError {
 
 pub fn cut_picture<I: image::GenericImageView>(
     picture: &I,
-    top_left: yapt::Point<u32>,
-    wh: yapt::Point<u32>,
+    top_left: yapt::point_2d::Point<u32>,
+    wh: yapt::point_2d::Point<u32>,
 ) -> image::SubImage<&I> {
     image::imageops::crop_imm(picture, top_left.x, top_left.y, wh.x, wh.y)
 }
