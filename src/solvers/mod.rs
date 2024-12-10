@@ -1,6 +1,9 @@
 use crate::{
     cut_picture,
-    slint_ui::{ClickCaptchaSolverUi, ClickCaptchaType, SlideOrRotateCaptchaType, SlintPoint},
+    slint_ui::{
+        ClickCaptchaSolverUi, ClickCaptchaType, SlideOrRotateCaptchaType, SlideOrRotateSolverUi,
+        SlintPoint,
+    },
     utils::rgba_image_to_slint_image,
     CaptchaError,
 };
@@ -15,6 +18,10 @@ pub mod slide_or_rotate;
 pub trait Marker {
     type Input;
     type Output;
+    type SolverUi: SolverUiTrait<Self>;
+    fn ui_solver(data: Self::Input) -> Result<Self::Output, CaptchaError> {
+        Self::SolverUi::ui_solver(data)
+    }
 }
 pub trait ClickCaptchaVerificationInfoTrait: Marker {
     fn get_captcha_type() -> ClickCaptchaType;
@@ -29,7 +36,6 @@ impl ClickCaptchaVerificationInfoTrait for MIconClick {
     fn get_captcha_type() -> ClickCaptchaType {
         ClickCaptchaType::IconClick
     }
-
     fn set_data(click_captcha_window: &ClickCaptchaSolverUi, image: DynamicImage) {
         let icon = cut_picture(&image, Point { x: 0, y: 160 }, Point { x: 84, y: 20 }).to_image();
         let image = cut_picture(&image, Point { x: 0, y: 0 }, Point { x: 320, y: 160 }).to_image();
@@ -38,7 +44,6 @@ impl ClickCaptchaVerificationInfoTrait for MIconClick {
         click_captcha_window.set_click_icon(icon);
         click_captcha_window.set_image(image);
     }
-
     fn points_to_output(points: ModelRc<SlintPoint>) -> Option<TriplePoint<u32>> {
         points
             .row_data(0)
@@ -55,7 +60,6 @@ impl ClickCaptchaVerificationInfoTrait for MTextClick {
     fn get_captcha_type() -> ClickCaptchaType {
         ClickCaptchaType::TextClick
     }
-
     fn set_data(
         click_captcha_window: &ClickCaptchaSolverUi,
         (hanzi, image): (String, DynamicImage),
@@ -64,7 +68,6 @@ impl ClickCaptchaVerificationInfoTrait for MTextClick {
         click_captcha_window.set_image(image);
         click_captcha_window.set_hanzi(hanzi.into());
     }
-
     fn points_to_output(points: ModelRc<SlintPoint>) -> Option<TriplePoint<u32>> {
         MIconClick::points_to_output(points)
     }
@@ -74,7 +77,6 @@ impl ClickCaptchaVerificationInfoTrait for MObstacle {
     fn get_captcha_type() -> ClickCaptchaType {
         ClickCaptchaType::Obstacle
     }
-
     fn set_data(click_captcha_window: &ClickCaptchaSolverUi, image: DynamicImage) {
         let icon = cut_picture(&image, Point { x: 0, y: 160 }, Point { x: 20, y: 20 }).to_image();
         let image = cut_picture(&image, Point { x: 0, y: 0 }, Point { x: 320, y: 160 }).to_image();
@@ -83,7 +85,6 @@ impl ClickCaptchaVerificationInfoTrait for MObstacle {
         click_captcha_window.set_click_icon(icon);
         click_captcha_window.set_image(image);
     }
-
     fn points_to_output(points: ModelRc<SlintPoint>) -> Option<Point<u32>> {
         points.row_data(0).map(SlintPoint::into_point)
     }
@@ -100,7 +101,7 @@ impl SlideOrRotateVerificationInfoTrait for MRotate {
     }
 }
 
-pub trait SolverUiTrait<T: Marker>: Sized + ComponentHandle {
+pub trait SolverUiTrait<T: Marker + ?Sized>: Sized + ComponentHandle {
     type DataContainer: Clone;
     fn new() -> Self;
     fn ui_solver(data: <T as Marker>::Input) -> Result<<T as Marker>::Output, CaptchaError> {
@@ -130,30 +131,30 @@ pub trait SolverUiTrait<T: Marker>: Sized + ComponentHandle {
 pub struct MSlide;
 impl Marker for MSlide {
     type Input = (DynamicImage, DynamicImage);
-
     type Output = u32;
+    type SolverUi = SlideOrRotateSolverUi;
 }
 pub struct MRotate;
 impl Marker for MRotate {
     type Input = (DynamicImage, DynamicImage);
-
     type Output = u32;
+    type SolverUi = SlideOrRotateSolverUi;
 }
 pub struct MIconClick;
 impl Marker for MIconClick {
     type Input = DynamicImage;
-
     type Output = (Point<u32>, Point<u32>, Point<u32>);
+    type SolverUi = ClickCaptchaSolverUi;
 }
 pub struct MTextClick;
 impl Marker for MTextClick {
     type Input = (String, DynamicImage);
-
     type Output = (Point<u32>, Point<u32>, Point<u32>);
+    type SolverUi = ClickCaptchaSolverUi;
 }
 pub struct MObstacle;
 impl Marker for MObstacle {
     type Input = DynamicImage;
-
     type Output = Point<u32>;
+    type SolverUi = ClickCaptchaSolverUi;
 }
