@@ -20,18 +20,5 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-[package]
-name = "captcha_solver_ui"
-version = "0.0.1"
-edition = "2021"
-authors = ["worksoup"]
-license = "MIT"
-repository = "https://github.com/worksoup/captcha_solver_ui"
-
-[dependencies]
-yapt = { git = "https://github.com/worksoup/yapt.git" }
-image = "0.25"
-slint = "1.8"
-
-[build-dependencies]
-slint-build = "1.8.0"
+merge_imports = true
+imports_layout = "Vertical"
