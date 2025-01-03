@@ -31,7 +31,7 @@ repository = "https://github.com/worksoup/captcha_solver_ui"
 [dependencies]
 yapt = { git = "https://github.com/worksoup/yapt.git" }
 image = "0.25"
-slint = "1.8"
+slint = "1.9"
 
 [build-dependencies]
-slint-build = "1.8.0"
+slint-build = "1.9"
