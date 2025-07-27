@@ -17,7 +17,7 @@
 [package]
 name = "captcha_solver_ui"
 version = "0.0.1"
-edition = "2021"
+edition = "2024"
 authors = ["worksoup"]
 license = "GPL-3.0"
 repository = "https://github.com/worksoup/captcha_solver_ui"
